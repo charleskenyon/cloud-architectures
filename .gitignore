@@ -1,0 +1,9 @@
+.terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+
+**/.env
+**/.env.development
+**/.env.production
+**/.secrets
