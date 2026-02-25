@@ -30,3 +30,6 @@ destroy:
 test:
 	@test -n "$(TEST_SCRIPT)" || (echo "No test script mapped for arch=$(arch)" && exit 1)
 	bash "$(TEST_SCRIPT)"
+
+onprem-up:
+	bash architectures/hybrid-cloud/tests/onprem-up.sh
