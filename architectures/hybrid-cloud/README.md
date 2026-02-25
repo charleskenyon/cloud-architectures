@@ -16,7 +16,7 @@ EC2 instances will be deployed in each of the VPCs to smoke test ICMP and DNS ne
 
 - Private EC2 instances accessed via SSM
 
-![Screenshot](docs/hybrid-cloud-architecture.png)
+<img src="./docs/hybrid-cloud-architecture.png" width="800">
 
 ## Prerequisites
 
