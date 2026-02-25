@@ -14,6 +14,11 @@ variable "vpc_id" {
 }
 
 variable "vpc_cidr" {
-  description = "THe CIDR of the VPC"
+  description = "The CIDR of the VPC"
+  type        = string
+}
+
+variable "subnet_id" {
+  description = "The subnet in which to place the VPC Endpoint"
   type        = string
 }

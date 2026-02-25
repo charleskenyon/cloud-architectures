@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  cgw:
+    build: ./
+    container_name: cgw
+    env_file:
+      - .onprem.env
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - NET_RAW

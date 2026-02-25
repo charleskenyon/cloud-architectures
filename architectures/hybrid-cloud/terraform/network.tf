@@ -1,7 +1,9 @@
 # VPC1
 
 resource "aws_vpc" "vpc1" {
-  cidr_block = var.vpc1_cidr
+  cidr_block           = var.vpc1_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "${var.arch}-vpc-1"
@@ -33,7 +35,9 @@ resource "aws_route_table_association" "vpc1_route_table_assoc" {
 # VPC2
 
 resource "aws_vpc" "vpc2" {
-  cidr_block = var.vpc2_cidr
+  cidr_block           = var.vpc2_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "${var.arch}-vpc-2"
@@ -94,7 +98,7 @@ resource "aws_route" "vpc1_tgw_route" {
 }
 
 resource "aws_route" "vpc2_tgw_route" {
-  route_table_id         = aws_route_table.vpc1_route_table.id
+  route_table_id         = aws_route_table.vpc2_route_table.id
   destination_cidr_block = var.vpc1_cidr
   transit_gateway_id     = aws_ec2_transit_gateway.tgw.id
 }
