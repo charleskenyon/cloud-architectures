@@ -74,12 +74,17 @@ resource "aws_codebuild_project" "codebuild_build" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+    image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
     type         = "LINUX_CONTAINER"
 
     environment_variable {
-      name  = "IMAGE_REPO_NAME"
-      value = aws_ecr_repository.ecr_container_repo.name
+      name  = "IMAGE_REPO_URL"
+      value = aws_ecr_repository.ecr_container_repo.repository_url
+    }
+
+    environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = var.deployment_account
     }
   }
 
