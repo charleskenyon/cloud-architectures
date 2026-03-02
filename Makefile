@@ -1,6 +1,6 @@
 -include .env
 
-arch								?= hybrid-cloud
+arch								?= blue-green-deployment
 export TF_VAR_region 				?= ${AWS_REGION}
 export TF_VAR_deployment_account 	 = ${AWS_ACCOUNT}
 export TF_VAR_arch 				 	 = ${arch}

@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - cd architectures/blue-green-deployment/lambda
+      - npm ci
+  pre_build:
+    commands:
+      - npm test
+  # build:
+  #   commands:
+  #     - docker build -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+  #     - docker push $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
