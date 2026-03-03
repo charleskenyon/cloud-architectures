@@ -49,7 +49,7 @@ resource "aws_codepipeline" "codepipeline" {
     name = "Build"
 
     action {
-      name             = "TerraformPlan"
+      name             = "TerraformBuild"
       category         = "Build"
       owner            = "AWS"
       provider         = "CodeBuild"

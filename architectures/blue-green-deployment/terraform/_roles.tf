@@ -45,10 +45,17 @@ resource "aws_iam_role_policy" "codebuild_policy" {
         ]
       },
       {
+        Sid    = "ECRAuthPolicy"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
         Effect = "Allow"
         Action = [
           "ecr:CompleteLayerUpload",
-          "ecr:GetAuthorizationToken",
           "ecr:UploadLayerPart",
           "ecr:InitiateLayerUpload",
           "ecr:BatchCheckLayerAvailability",
@@ -59,36 +66,6 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           aws_ecr_repository.ecr_container_repo.arn
         ]
       }
-      #    {
-      #     Sid    = "ECRPullPolicy"
-      #     Effect = "Allow"
-      #     Action = [
-      #       "ecr:BatchCheckLayerAvailability",
-      #       "ecr:GetDownloadUrlForLayer",
-      #       "ecr:BatchGetImage"
-      #     ]
-      #     Resource = "*"
-      #   },
-      #   {
-      #     Sid    = "ECRAuthPolicy"
-      #     Effect = "Allow"
-      #     Action = [
-      #       "ecr:GetAuthorizationToken"
-      #     ]
-      #     Resource = "*"
-      #   },
-      #   {
-      #     Effect = "Allow"
-      #     Action = [
-      #       "ecr:CompleteLayerUpload",
-      #       "ecr:UploadLayerPart",
-      #       "ecr:InitiateLayerUpload",
-      #       "ecr:PutImage"
-      #     ]
-      #     Resource = [
-      #       aws_ecr_repository.ecr_container_repo.arn
-      #     ]
-      #   }
     ]
   })
 }
