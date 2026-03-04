@@ -41,3 +41,25 @@ resource "aws_ecr_lifecycle_policy" "ecr_container_repo_policy" {
     ]
   })
 }
+
+# data "aws_iam_policy_document" "ecr_container_repo_policy_document" {
+#   statement {
+#     effect = "Allow"
+
+#     principals {
+#       type        = "Service"
+#       identifiers = "lambda.amazonaws.com"
+#     }
+
+#     actions = [
+#       "ecr:GetDownloadUrlForLayer",
+#       "ecr:BatchGetImage",
+#       "ecr:BatchCheckLayerAvailability"
+#     ]
+#   }
+# }
+
+# resource "aws_ecr_repository_policy" "ecr_container_repo_policy" {
+#   repository = aws_ecr_repository.ecr_container_repo.name
+#   policy     = data.aws_iam_policy_document.ecr_container_repo_policy_document.json
+# }

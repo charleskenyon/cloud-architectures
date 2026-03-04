@@ -8,6 +8,11 @@ variable "arch" {
   type        = string
 }
 
+variable "create_lambda" {
+  type    = bool
+  default = false
+}
+
 variable "deployment_account" {
   description = "The AWS account to deploy the architecure"
   type        = string

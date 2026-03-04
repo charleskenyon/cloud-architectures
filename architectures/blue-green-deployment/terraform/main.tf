@@ -7,24 +7,31 @@ resource "aws_codecommit_repository" "deployment_repo" {
   }
 }
 
-# resource "aws_codecommit_trigger" "deployment_repo_trigger_codepipeline" {
-#   repository_name = aws_codecommit_repository.deployment_repo.repository_name
+module "app" {
+  count  = var.create_lambda ? 1 : 0
+  source = "../../../common/terraform/modules/lambda"
 
-#   trigger {
-#     name            = "all"
-#     events          = ["all"]
-#     destination_arn = aws_codepipeline.codepipeline.arn
-#     branches        = ["main"]
-#   }
-# }
+  function_name  = "${var.arch}-app-lambda"
+  function_image = aws_ecr_repository.ecr_container_repo.repository_url
+  handler        = "index.handler"
+}
+
+resource "aws_lambda_alias" "app_live_alias" {
+  count            = var.create_lambda ? 1 : 0
+  name             = "live"
+  function_name    = module.app.function_arn
+  function_version = "1"
+}
 
 resource "aws_codepipeline" "codepipeline" {
-  name     = "${var.arch}-pipeline"
+  name     = "${var.arch}-app-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
     location = aws_s3_bucket.s3_codepipeline_bucket.bucket
     type     = "S3"
+
+    # no encryption_key -> uses default AWS-managed S3 key, for real-world usuage KMS CMK should be provided 
   }
 
   stage {

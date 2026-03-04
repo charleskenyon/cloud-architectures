@@ -31,5 +31,8 @@ test:
 	@test -n "$(TEST_SCRIPT)" || (echo "No test script mapped for arch=$(arch)" && exit 1)
 	bash "$(TEST_SCRIPT)"
 
+security:
+	checkov -d architectures/${arch}/terraform --quiet --framework terraform
+
 onprem-up:
 	bash architectures/hybrid-cloud/tests/onprem-up.sh

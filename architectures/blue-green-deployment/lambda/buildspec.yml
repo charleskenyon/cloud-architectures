@@ -16,7 +16,9 @@ phases:
     commands:
       - pwd
       - docker build -t $IMAGE_REPO_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      - docker tag  $IMAGE_REPO_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION $IMAGE_REPO_URL:latest
       - docker push $IMAGE_REPO_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push $IMAGE_REPO_URL:latest
 
 artifacts:
   files:

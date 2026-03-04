@@ -16,3 +16,25 @@ resource "aws_s3_bucket_versioning" "s3_codepipeline_bucket" {
     status = "Enabled"
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
+  bucket = aws_s3_bucket.s3_codepipeline_bucket.id
+
+  rule {
+    id     = "expire-old-artifacts"
+    status = "Enabled"
+
+    expiration {
+      days = 7
+    }
+  }
+
+  rule {
+    id     = "abort-incomplete-multipart-upload"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+
+}
