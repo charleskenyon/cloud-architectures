@@ -41,8 +41,12 @@ git remote set-url origin --push --add https://git-codecommit.us-east-1.amazonaw
 
 https://repost.aws/questions/QUmBq_nac-Qh2rUF7Tn94JXw/how-to-trigger-aws-code-pipeline-on-any-branch-with-specific-tag
 
-app delivery pipeline (test, build, deploy)
+app delivery pipeline (test, build, deploy), manually deploy platform infra
 
 https://oneuptime.com/blog/post/2026-02-12-codedeploy-lambda-deployments/view
 
 https://docs.aws.amazon.com/codedeploy/latest/userguide/tutorial-lambda-sam.html
+
+https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-Commands.html
+
+https://stackoverflow.com/questions/53136089/codepipeline-codedeploy-reports-bundletype-must-be-either-yaml-or-json?rq=3

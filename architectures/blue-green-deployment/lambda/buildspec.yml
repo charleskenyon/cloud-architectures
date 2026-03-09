@@ -22,8 +22,6 @@ phases:
 
   post_build:
     commands:
-      - echo "$APP_LAMBDA_NAME"
-      - aws lambda get-alias --function-name blue-green-deployment-app-lambda --name live
       - CURRENT_VERSION=$(aws lambda get-alias --function-name "$APP_LAMBDA_NAME" --name live --query 'FunctionVersion' --output text)
 
       # update function to new image and publish a new version
@@ -33,7 +31,7 @@ phases:
 
       # create appspec.yml for CodeDeploy
       - |
-        cat > appspec.yml <<EOF
+        cat > "$CODEBUILD_SRC_DIR/appspec.yml" <<EOF
         version: 0.0
         Resources:
           - myLambdaFunction:
