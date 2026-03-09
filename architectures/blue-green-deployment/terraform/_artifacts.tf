@@ -27,6 +27,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
     expiration {
       days = 7
     }
+
+    filter {}
   }
 
   rule {
@@ -35,6 +37,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
     abort_incomplete_multipart_upload {
       days_after_initiation = 1
     }
+
+    filter {}
   }
 
 }

@@ -20,6 +20,29 @@ phases:
       - docker push $IMAGE_REPO_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION
       - docker push $IMAGE_REPO_URL:latest
 
+  post_build:
+    commands:
+      - CURRENT_VERSION=$(aws lambda get-alias --function-name "$APP_LAMBDA_NAME" --name live --query 'FunctionVersion' --output text)
+
+      # update function to new image and publish a new version
+      - aws lambda update-function-code --function-name "$APP_LAMBDA_NAME" --image-uri "$IMAGE_REPO_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION" >/dev/null
+      - aws lambda wait function-updated --function-name "$APP_LAMBDA_NAME"
+      - TARGET_VERSION=$(aws lambda publish-version --function-name "$APP_LAMBDA_NAME" --query 'Version' --output text)
+
+      # create appspec.yml for CodeDeploy
+      - |
+        cat > appspec.yml <<EOF
+        version: 0.0
+        Resources:
+          - myLambdaFunction:
+              Type: AWS::Lambda::Function
+              Properties:
+                Name: "$APP_LAMBDA_NAME"
+                Alias: "live"
+                CurrentVersion: "$CURRENT_VERSION"
+                TargetVersion: "$TARGET_VERSION"
+        EOF
+
 artifacts:
   files:
     - "**/*"

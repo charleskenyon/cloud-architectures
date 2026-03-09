@@ -1,3 +1,7 @@
+locals {
+  app_function_name = "${var.arch}-app-lambda"
+}
+
 resource "aws_codecommit_repository" "deployment_repo" {
   repository_name = "${var.arch}-repo"
   description     = "repo for ${var.arch}"
@@ -11,7 +15,7 @@ module "app" {
   count  = var.create_lambda ? 1 : 0
   source = "../../../common/terraform/modules/lambda"
 
-  function_name  = "${var.arch}-app-lambda"
+  function_name  = local.app_function_name
   function_image = aws_ecr_repository.ecr_container_repo.repository_url
   handler        = "index.handler"
 }
@@ -19,7 +23,7 @@ module "app" {
 resource "aws_lambda_alias" "app_live_alias" {
   count            = var.create_lambda ? 1 : 0
   name             = "live"
-  function_name    = module.app.function_arn
+  function_name    = module.app[0].function_arn
   function_version = "1"
 }
 
@@ -92,6 +96,11 @@ resource "aws_codebuild_project" "codebuild_build" {
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
       value = var.deployment_account
+    }
+
+    environment_variable {
+      name  = "APP_LAMBDA_NAME"
+      value = local.app_function_name
     }
   }
 

@@ -3,7 +3,7 @@ resource "aws_lambda_function" "example_lambda" {
   role          = aws_iam_role.example_lambda_role.arn
   package_type  = "Image"
   image_uri     = "${var.function_image}:latest"
-  runtime       = "nodejs22.x"
+  publish       = true
 
   image_config {
     command = [var.handler]

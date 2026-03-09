@@ -44,3 +44,5 @@ https://repost.aws/questions/QUmBq_nac-Qh2rUF7Tn94JXw/how-to-trigger-aws-code-pi
 app delivery pipeline (test, build, deploy)
 
 https://oneuptime.com/blog/post/2026-02-12-codedeploy-lambda-deployments/view
+
+https://docs.aws.amazon.com/codedeploy/latest/userguide/tutorial-lambda-sam.html
