@@ -68,6 +68,7 @@ resource "aws_codepipeline" "codepipeline" {
       version          = "1"
       input_artifacts  = ["source_output"]
       output_artifacts = ["build_output"]
+      namespace        = "BuildVariables"
 
       configuration = {
         ProjectName = aws_codebuild_project.codebuild_build.name
@@ -102,13 +103,14 @@ resource "aws_codepipeline" "codepipeline" {
       owner            = "AWS"
       provider         = "Lambda"
       version          = "1"
-      input_artifacts  = ["build_output"]
+      input_artifacts  = []
       output_artifacts = []
 
       configuration = {
-        DeployStrategy = "Canary10Percent5Minutes"
-        FunctionAlias : "live"
-        FunctionName : local.app_function_name
+        DeployStrategy         = "Canary10Percent5Minutes"
+        FunctionAlias          = "live"
+        FunctionName           = local.app_function_name
+        PublishedTargetVersion = "#{BuildVariables.TARGET_VERSION}"
       }
     }
   }
