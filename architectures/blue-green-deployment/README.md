@@ -50,3 +50,5 @@ https://docs.aws.amazon.com/codedeploy/latest/userguide/tutorial-lambda-sam.html
 https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-Commands.html
 
 https://stackoverflow.com/questions/53136089/codepipeline-codedeploy-reports-bundletype-must-be-either-yaml-or-json?rq=3
+
+https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-LambdaDeploy.html

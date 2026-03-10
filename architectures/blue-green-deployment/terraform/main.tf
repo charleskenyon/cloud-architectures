@@ -28,8 +28,9 @@ resource "aws_lambda_alias" "app_live_alias" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  name     = "${var.arch}-app-pipeline"
-  role_arn = aws_iam_role.codepipeline_role.arn
+  name          = "${var.arch}-app-pipeline"
+  role_arn      = aws_iam_role.codepipeline_role.arn
+  pipeline_type = "V2"
 
   artifact_store {
     location = aws_s3_bucket.s3_codepipeline_bucket.bucket
@@ -74,6 +75,24 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
+  # stage {
+  #   name = "Deploy"
+
+  #   action {
+  #     name             = "Deploy"
+  #     category         = "Deploy"
+  #     owner            = "AWS"
+  #     provider         = "Lambda"
+  #     version          = "1"
+  #     input_artifacts  = ["build_output"]
+  #     output_artifacts = []
+
+  #     configuration = {
+  #       DeployStrategy      = aws_codedeploy_app.codedeploy_app.name
+  #       DeploymentGroupName = aws_codedeploy_deployment_group.codedeploy_deployment_group.deployment_group_name
+  #     }
+  #   }
+  # }
   stage {
     name = "Deploy"
 
@@ -81,14 +100,15 @@ resource "aws_codepipeline" "codepipeline" {
       name             = "Deploy"
       category         = "Deploy"
       owner            = "AWS"
-      provider         = "CodeDeploy"
+      provider         = "Lambda"
       version          = "1"
       input_artifacts  = ["build_output"]
       output_artifacts = []
 
       configuration = {
-        ApplicationName     = aws_codedeploy_app.codedeploy_app.name
-        DeploymentGroupName = aws_codedeploy_deployment_group.codedeploy_deployment_group.deployment_group_name
+        DeployStrategy = "Canary10Percent5Minutes"
+        FunctionAlias : "live"
+        FunctionName : local.app_function_name
       }
     }
   }
@@ -135,25 +155,25 @@ resource "aws_codebuild_project" "codebuild_build" {
   }
 }
 
-resource "aws_codedeploy_app" "codedeploy_app" {
-  name             = "${var.arch}-codedeploy-app"
-  compute_platform = "Lambda"
-}
+# resource "aws_codedeploy_app" "codedeploy_app" {
+#   name             = "${var.arch}-codedeploy-app"
+#   compute_platform = "Lambda"
+# }
 
-resource "aws_codedeploy_deployment_group" "codedeploy_deployment_group" {
-  app_name               = aws_codedeploy_app.codedeploy_app.name
-  deployment_group_name  = "${var.arch}-codedeploy-deployment-group"
-  service_role_arn       = aws_iam_role.codedeploy_role.arn
-  deployment_config_name = "CodeDeployDefault.LambdaCanary10Percent5Minutes"
-  deployment_style {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
-    deployment_type   = "BLUE_GREEN"
-  }
-  auto_rollback_configuration {
-    enabled = true
-    events  = ["DEPLOYMENT_FAILURE"]
-  }
-}
+# resource "aws_codedeploy_deployment_group" "codedeploy_deployment_group" {
+#   app_name               = aws_codedeploy_app.codedeploy_app.name
+#   deployment_group_name  = "${var.arch}-codedeploy-deployment-group"
+#   service_role_arn       = aws_iam_role.codedeploy_role.arn
+#   deployment_config_name = "CodeDeployDefault.LambdaCanary10Percent5Minutes"
+#   deployment_style {
+#     deployment_option = "WITH_TRAFFIC_CONTROL"
+#     deployment_type   = "BLUE_GREEN"
+#   }
+#   auto_rollback_configuration {
+#     enabled = true
+#     events  = ["DEPLOYMENT_FAILURE"]
+#   }
+# }
 
 
 # CodeDeployDefault.LambdaCanary10Percent5Minutes
