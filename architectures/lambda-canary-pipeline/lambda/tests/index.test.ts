@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, Context } from "aws-lambda";
+import { APIGatewayEvent, Context } from "aws-lambda";
 import { handler } from "../src";
 
 describe("Lambda Handler", () => {
@@ -8,13 +8,14 @@ describe("Lambda Handler", () => {
       pathParameters: null,
       queryStringParameters: {},
       body: null,
-    } as unknown as APIGatewayProxyEvent;
-
+      deploymentTest: false,
+      isForceFailure: false,
+    } as APIGatewayEvent & { deploymentTest: boolean; isForceFailure: boolean };
     const context = {} as unknown as Context;
 
     const result = await handler(event, context);
 
     expect(result.statusCode).toBe(200);
-    expect(JSON.parse(result.body)).toEqual({ message: "hello world" });
+    expect(JSON.parse(result.body)).toEqual({ message: "SUCCESS" });
   });
 });
