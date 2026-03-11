@@ -5,7 +5,7 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd architectures/blue-green-deployment/lambda
+      - cd architectures/lambda-canary-pipeline/lambda
       - npm ci
   pre_build:
     commands:

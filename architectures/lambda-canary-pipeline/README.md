@@ -37,7 +37,7 @@ git config --global credential.helper '!aws codecommit credential-helper $@'
 git config --global credential.UseHttpPath true
 AWS_PROFILE="048408301264_AdministratorAccess" git push -u origin main
 
-git remote set-url origin --push --add https://git-codecommit.us-east-1.amazonaws.com/v1/repos/blue-green-deployment-repo
+git remote set-url origin --push --add https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lambda-canary-pipeline-repo
 
 https://repost.aws/questions/QUmBq_nac-Qh2rUF7Tn94JXw/how-to-trigger-aws-code-pipeline-on-any-branch-with-specific-tag
 
@@ -52,3 +52,22 @@ https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-Comma
 https://stackoverflow.com/questions/53136089/codepipeline-codedeploy-reports-bundletype-must-be-either-yaml-or-json?rq=3
 
 https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-LambdaDeploy.html
+
+lambda-container-pipeline
+
+LambdaErrors > threshold
+LambdaThrottles > threshold
+5XX from API Gateway
+p95 latency spike
+
+TARGET_VERSION=42
+
+aws lambda invoke \
+ --function-name "${APP_LAMBDA_NAME}:${TARGET_VERSION}" \
+ --cli-binary-format raw-in-base64-out \
+ --payload '{"deploymentTest":true,"forceFailure":true}' \
+ /tmp/response.json
+
+aws codepipeline start-pipeline-execution --name MyFirstPipeline
+
+lambda-canary-pipeline

@@ -5,10 +5,6 @@ locals {
 resource "aws_codecommit_repository" "deployment_repo" {
   repository_name = "${var.arch}-repo"
   description     = "repo for ${var.arch}"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 module "app" {
@@ -51,8 +47,9 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        RepositoryName = aws_codecommit_repository.deployment_repo.repository_name
-        BranchName     = "main"
+        RepositoryName       = aws_codecommit_repository.deployment_repo.repository_name
+        BranchName           = "main"
+        PollForSourceChanges = false
       }
     }
   }
@@ -76,24 +73,6 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-  # stage {
-  #   name = "Deploy"
-
-  #   action {
-  #     name             = "Deploy"
-  #     category         = "Deploy"
-  #     owner            = "AWS"
-  #     provider         = "Lambda"
-  #     version          = "1"
-  #     input_artifacts  = ["build_output"]
-  #     output_artifacts = []
-
-  #     configuration = {
-  #       DeployStrategy      = aws_codedeploy_app.codedeploy_app.name
-  #       DeploymentGroupName = aws_codedeploy_deployment_group.codedeploy_deployment_group.deployment_group_name
-  #     }
-  #   }
-  # }
   stage {
     name = "Deploy"
 
@@ -153,29 +132,6 @@ resource "aws_codebuild_project" "codebuild_build" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "architectures/blue-green-deployment/lambda/buildspec.yml"
+    buildspec = "architectures/lambda-canary-pipeline/lambda/buildspec.yml"
   }
 }
-
-# resource "aws_codedeploy_app" "codedeploy_app" {
-#   name             = "${var.arch}-codedeploy-app"
-#   compute_platform = "Lambda"
-# }
-
-# resource "aws_codedeploy_deployment_group" "codedeploy_deployment_group" {
-#   app_name               = aws_codedeploy_app.codedeploy_app.name
-#   deployment_group_name  = "${var.arch}-codedeploy-deployment-group"
-#   service_role_arn       = aws_iam_role.codedeploy_role.arn
-#   deployment_config_name = "CodeDeployDefault.LambdaCanary10Percent5Minutes"
-#   deployment_style {
-#     deployment_option = "WITH_TRAFFIC_CONTROL"
-#     deployment_type   = "BLUE_GREEN"
-#   }
-#   auto_rollback_configuration {
-#     enabled = true
-#     events  = ["DEPLOYMENT_FAILURE"]
-#   }
-# }
-
-
-# CodeDeployDefault.LambdaCanary10Percent5Minutes
