@@ -90,6 +90,7 @@ resource "aws_codepipeline" "codepipeline" {
         FunctionAlias          = "live"
         FunctionName           = local.app_function_name
         PublishedTargetVersion = "#{BuildVariables.TARGET_VERSION}"
+        Alarms                 = aws_cloudwatch_metric_alarm.lambda_errors.id
       }
     }
   }
@@ -133,5 +134,22 @@ resource "aws_codebuild_project" "codebuild_build" {
   source {
     type      = "CODEPIPELINE"
     buildspec = "architectures/lambda-canary-pipeline/lambda/buildspec.yml"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
+  alarm_name          = "${local.app_function_name}-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "Lambda function ${local.app_function_name} has more than 0 errors in 1 minute"
+
+  dimensions = {
+    FunctionName = local.app_function_name
+    Resource     = "${local.app_function_name}:live"
   }
 }

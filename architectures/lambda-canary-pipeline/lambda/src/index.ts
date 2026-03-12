@@ -15,6 +15,7 @@ export const handler = async (
     statusCode: 200,
     body: JSON.stringify({
       message: "SUCCESS",
+      version: process.env.AWS_LAMBDA_FUNCTION_VERSION,
     }),
   };
 };

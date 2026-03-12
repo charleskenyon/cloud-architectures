@@ -168,6 +168,13 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         ]
         Resource = "*"
       },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:DescribeAlarms"
+        ]
+        Resource = ["arn:aws:cloudwatch:${var.region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.lambda_errors.id}"]
+      }
     ]
   })
 }

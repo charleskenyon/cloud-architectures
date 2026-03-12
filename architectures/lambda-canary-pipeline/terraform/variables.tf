@@ -10,7 +10,7 @@ variable "arch" {
 
 variable "create_lambda" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "deployment_account" {
