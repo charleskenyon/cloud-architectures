@@ -7,6 +7,8 @@ export TF_VAR_arch 				 	 = ${arch}
 
 ifeq ($(arch),hybrid-cloud)
 TEST_SCRIPT := architectures/hybrid-cloud/tests/test-network-connectivity.sh
+else ifeq ($(arch),lambda-canary-pipeline)
+TEST_SCRIPT := architectures/lambda-canary-pipeline/tests/lambda-rollout-smoke-test.sh
 endif
 
 all: init validate plan
@@ -36,3 +38,6 @@ security:
 
 onprem-up:
 	bash architectures/hybrid-cloud/tests/onprem-up.sh
+
+lambda-canary-force-failure:
+	bash architectures/lambda-canary-pipeline/tests/lambda-force-rollback.sh

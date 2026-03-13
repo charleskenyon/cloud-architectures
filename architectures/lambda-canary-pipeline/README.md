@@ -53,7 +53,7 @@ https://stackoverflow.com/questions/53136089/codepipeline-codedeploy-reports-bun
 
 https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-LambdaDeploy.html
 
-lambda-container-pipeline
+lambda-canary-pipeline
 
 LambdaErrors > threshold
 LambdaThrottles > threshold
@@ -62,11 +62,7 @@ p95 latency spike
 
 TARGET_VERSION=42
 
-aws lambda invoke \
- --function-name "${APP_LAMBDA_NAME}:${TARGET_VERSION}" \
- --cli-binary-format raw-in-base64-out \
- --payload '{"deploymentTest":true,"forceFailure":true}' \
- /tmp/response.json
+aws lambda invoke --function-name "lambda-canary-pipeline-app-lambda:live" --cli-binary-format raw-in-base64-out --payload '{"deploymentTest":true,"isForceFailure":true}' /dev/stdout
 
 aws codepipeline start-pipeline-execution --name MyFirstPipeline
 

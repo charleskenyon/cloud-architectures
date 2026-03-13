@@ -34,7 +34,17 @@ make apply arch=hybrid-cloud
 
 This will deploy the architecture to your locally authenticated AWS account (Note: you must have either temporary or user AWS credential saved to your local configuration files or exported as local environment variables - see [Configuration and credential file settings in the AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html))
 
-Once this infrastructure has been provisioned download the VPN configuration file from the AWS console (see [Download the configuration file](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html#vpn-download-config)) and add the corresponding values to architectures/hybrid-cloud/onprem/.onprem.env (`Pre-Shared Key` to `T1_PSK` & `Outside IP Addresses: Virtual Private Gateway` to `T1_AWS_OUTSIDE_IP` for both listed tunnels). The onprem env configuration file also needs the IPs of your Route 53 Resolver Endpoints which can be found in the terraform output and also the LAN network IPs for the machine you are using to host the simulated on-premises network (e.g. your laptop private LAN IP and CIDR). Once this is done run `make onprem-up` to bring up the containerized simulated on-premises network.
+Once this infrastructure has been provisioned download the VPN configuration file from the AWS console (see [Download the configuration file](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html#vpn-download-config)) and add the corresponding values to architectures/hybrid-cloud/onprem/.onprem.env (Tunnel 1 `Pre-Shared Key` to `T1_PSK` & `Outside IP Addresses: Virtual Private Gateway` to `T1_AWS_OUTSIDE_IP` & Tunnel 2 `Pre-Shared Key` to `T2_PSK` & `Outside IP Addresses: Virtual Private Gateway` to `T2_AWS_OUTSIDE_IP`).
+
+Other .onprem.env environement variables that must be set are:
+
+- `R53_RSLV_INBOUND_ENDPOINT_IP` & `R53_RSLV_INBOUND_ENDPOINT_IP2` - the IPs of your Route 53 Resolver Endpoints which can be found in the terraform output.
+
+- `CGW_LAN_IP` & `CGW_LAN_CIDR` - your LAN device IP and network CIDR (run `ip a` on linux or `ifconfig -a` on mac).
+
+- `VPC1_CIDR` & `VPC2_CIDR` - the CIDRs of the VPCs which are set in the terraform variables.
+
+Once this is done run `make onprem-up` to bring up the containerized simulated on-premises network.
 
 ## Deployment Validation
 

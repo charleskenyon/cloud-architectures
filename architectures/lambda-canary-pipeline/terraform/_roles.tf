@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 resource "aws_iam_role" "codebuild_role" {
   name = "${var.arch}-codebuild-role"
 
@@ -174,7 +172,18 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "cloudwatch:DescribeAlarms"
         ]
         Resource = ["arn:aws:cloudwatch:${var.region}:${data.aws_caller_identity.current.account_id}:alarm:${aws_cloudwatch_metric_alarm.lambda_errors.id}"]
-      }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:DescribeKey",
+          "kms:GenerateDataKey*",
+          "kms:Encrypt",
+          "kms:ReEncrypt*",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.kms_key.arn]
+      },
     ]
   })
 }

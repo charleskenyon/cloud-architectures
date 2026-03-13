@@ -1,3 +1,0 @@
-terraform apply -var create_lambda=false
-aws codepipeline start-pipeline-execution --name ...
-terraform apply -var create_lambda=true

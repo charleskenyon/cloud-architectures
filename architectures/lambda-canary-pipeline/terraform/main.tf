@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   app_function_name = "${var.arch}-app-lambda"
 }
@@ -32,7 +34,10 @@ resource "aws_codepipeline" "codepipeline" {
     location = aws_s3_bucket.s3_codepipeline_bucket.bucket
     type     = "S3"
 
-    # no encryption_key -> uses default AWS-managed S3 key, for real-world usuage KMS CMK should be provided 
+    encryption_key {
+      id   = aws_kms_key.kms_key.id
+      type = "KMS"
+    }
   }
 
   stage {
