@@ -6,3 +6,4 @@ A repository of reference cloud architecture implementations (AWS, Terraform)
 
 - Hybrid Cloud
 - Lambda Canary Pipeline
+- Warm Standby
