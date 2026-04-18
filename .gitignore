@@ -10,4 +10,5 @@ node_modules/
 **/.env.production
 **/.secrets
 
+lambda.zip
 

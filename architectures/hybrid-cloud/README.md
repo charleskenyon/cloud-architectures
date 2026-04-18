@@ -34,7 +34,11 @@ make apply arch=hybrid-cloud
 
 This will deploy the architecture to your locally authenticated AWS account (Note: you must have either temporary or user AWS credential saved to your local configuration files or exported as local environment variables - see [Configuration and credential file settings in the AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-files.html))
 
-Once this infrastructure has been provisioned download the VPN configuration file from the AWS console (see [Download the configuration file](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html#vpn-download-config)) and add the corresponding values to architectures/hybrid-cloud/onprem/.onprem.env (Tunnel 1 `Pre-Shared Key` to `T1_PSK` & `Outside IP Addresses: Virtual Private Gateway` to `T1_AWS_OUTSIDE_IP` & Tunnel 2 `Pre-Shared Key` to `T2_PSK` & `Outside IP Addresses: Virtual Private Gateway` to `T2_AWS_OUTSIDE_IP`).
+Once this infrastructure has been provisioned download the VPN configuration file from the AWS console (see [Download the configuration file](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html#vpn-download-config)) and add the corresponding values to architectures/hybrid-cloud/onprem/.onprem.env:
+
+- Tunnel 1 `Pre-Shared Key` config file value to `T1_PSK` & `Outside IP Addresses: Virtual Private Gateway` config file value to `T1_AWS_OUTSIDE_IP`.
+
+- Tunnel 2 `Pre-Shared Key` config file value to `T2_PSK` & `Outside IP Addresses: Virtual Private Gateway` config file value to `T2_AWS_OUTSIDE_IP`.
 
 Other .onprem.env environement variables that must be set are:
 

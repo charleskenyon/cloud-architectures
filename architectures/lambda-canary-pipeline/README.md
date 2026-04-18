@@ -1,69 +1,54 @@
-lambda develop --> AWS Runtime Interface Emulator --> test --> ECR --> lambda hosted
+# Lambda Canary Pipeline
 
-## https://gallery.ecr.aws/lambda/nodejs
+## Overview
 
-<!-- https://docs.aws.amazon.com/lambda/latest/dg/typescript-image.html -->
+A Lambda container release pipeline that tests and builds a Lambda container using the Lambda Runtime Interface Emulator before publishing the image to ECR. The pipeline then triggers a canary rollout (`Canary10Percent5Minutes`) using weighted aliases. The pipeline monitors a CloudWatch alarm for Lambda errors and abandons the release if any errors are detected. The pipeline uses AWS CodePipeline and AWS CodeDeploy, and the artifacts are encrypted using KMS.
 
-docker buildx build --platform linux/amd64 --provenance=false -t lambda-ts:test .
-docker run --platform linux/amd64 -p 9000:8080 lambda-ts:test
-curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+## Architecture
 
-- codepipeline --> unit test --> integration test (build image and run with docker, invoke via rie endpoint and assert response)
+- AWS CodePipeline, AWS CodeDeploy, AWS CodeCommit, AWS Lambda, AWS ECR, AWS KMS, AWS S3, AWS CloudWatch, AWS IAM roles for CodePipeline & CodeDeploy
 
----
+## Prerequisites
 
-- allows you to debug faulty deployment stack without simply overwriting it with a stable version
-- test deployed release candidate before shifting DNS
-- zero downtime
-- weighted target group forwarder rules
+Terraform, user or role-based access to an AWS account (with permission to create the resources outlined above and local AWS CLI access).
 
-- layered resilience
-- code deploy alias shifting for safe rollout (10 minute back and alarm)
-- post-release event bridge on alarm triggers ALB TG alias shift
+## Quick Start
 
----
+To begin, ensure that the Terraform variable `create_lambda` (in architectures/lambda-canary-pipeline/terraform/variables.tf) is set to `false` and deploy the platform infrastructure from the repository root:
 
-https://oneuptime.com/blog/post/2026-02-23-how-to-build-a-ci-cd-infrastructure-with-terraform/view
+```
+make arch=lambda-canary-pipeline
 
-https://dev.to/aws-builders/deploying-terraform-code-via-aws-codebuild-and-aws-codepipeline-2l0
+make apply arch=lambda-canary-pipeline
+```
 
-https://www.tecracer.com/blog/2023/05/build-terraform-ci/cd-pipelines-using-aws-codepipeline.html
+Once the infrastructure has been deployed Terraform will output `build_repo_url`. Add the AWS Codecommit repository address as a remote and push to it:
 
-https://oneuptime.com/blog/post/2026-02-23-package-lambda-code-with-terraform/view#:~:text=There%20are%20multiple%20ways%20to,deployment%20for%20CI%2FCD%20pipelines.
+```
+`git remote set-url origin --push --add https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lambda-canary-pipeline-repo
+```
 
-git remote add origin https://git-codecommit.us-east-2.amazonaws.com/v1/repos/MyDemoRepo
+See the AWS documentation for setup steps for HTTPS connections to CodeCommit: [Setup steps for HTTPS connections to AWS CodeCommit](https://docs.aws.amazon.com/codecommit/latest/userguide/setting-up-https-windows.html#setting-up-https-windows-credential-helper)
 
-git config --global credential.helper '!aws codecommit credential-helper $@'
-git config --global credential.UseHttpPath true
-AWS_PROFILE="048408301264_AdministratorAccess" git push -u origin main
+This push will trigger a CodePipeline event that builds the Lambda image and pushes it to ECR. The pipeline will fail at the step where the image is published to Lambda, as the Lambda function does not exist yet.
 
-git remote set-url origin --push --add https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lambda-canary-pipeline-repo
+Next, set the Terraform variable `create_lambda` to `true` and redeploy the platform infrastructure from the repository root. This bootstrap step will create the Lambda infrastructure, and once complete the pipeline will be ready for testing.
 
-https://repost.aws/questions/QUmBq_nac-Qh2rUF7Tn94JXw/how-to-trigger-aws-code-pipeline-on-any-branch-with-specific-tag
+## Deployment Validation
 
-app delivery pipeline (test, build, deploy), manually deploy platform infra
+Trigger a CodePipeline execution either by pushing to the repository or manually triggering it in the AWS console. Monitor the stages in the console. When the Deploy stage is reached, run:
 
-https://oneuptime.com/blog/post/2026-02-12-codedeploy-lambda-deployments/view
+```
+make test arch=lambda-canary-pipeline
+```
 
-https://docs.aws.amazon.com/codedeploy/latest/userguide/tutorial-lambda-sam.html
+To test the rollback functionality, run the pipeline again and run `make lambda-canary-force-failure` at the `Deploy` stage to intentioanlly trigger a canary rollback and pipeline failure.
 
-https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-Commands.html
+## Local Testing
 
-https://stackoverflow.com/questions/53136089/codepipeline-codedeploy-reports-bundletype-must-be-either-yaml-or-json?rq=3
+To run the Lambda locally, navigate to architectures/lambda-canary-pipeline/lambda and run:
 
-https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-LambdaDeploy.html
+- `docker buildx build --platform linux/amd64 --provenance=false -t lambda-ts:test .` - to build the image.
 
-lambda-canary-pipeline
-
-LambdaErrors > threshold
-LambdaThrottles > threshold
-5XX from API Gateway
-p95 latency spike
-
-TARGET_VERSION=42
-
-aws lambda invoke --function-name "lambda-canary-pipeline-app-lambda:live" --cli-binary-format raw-in-base64-out --payload '{"deploymentTest":true,"isForceFailure":true}' /dev/stdout
-
-aws codepipeline start-pipeline-execution --name MyFirstPipeline
-
-lambda-canary-pipeline
+- `docker run --platform linux/amd64 -p 9000:8080 lambda-ts:test
+curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'` - to run the Lambda locally inside the Runtime Interface Emulator.

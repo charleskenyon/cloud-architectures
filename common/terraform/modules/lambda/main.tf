@@ -9,6 +9,10 @@ resource "aws_lambda_function" "example_lambda" {
     command = [var.handler]
   }
 
+  logging_config {
+    log_format = "JSON"
+  }
+
   memory_size = var.memory_size
   timeout     = var.timeout
 

@@ -1,14 +1,17 @@
 -include .env
 
-arch								?= lambda-canary-pipeline
+arch								?= warm-standby
 export TF_VAR_region 				?= ${AWS_REGION}
 export TF_VAR_deployment_account 	 = ${AWS_ACCOUNT}
 export TF_VAR_arch 				 	 = ${arch}
+export TF_VAR_domain 				?= ${WARM_STANDBY_DOMAIN}
 
 ifeq ($(arch),hybrid-cloud)
 TEST_SCRIPT := architectures/hybrid-cloud/tests/test-network-connectivity.sh
 else ifeq ($(arch),lambda-canary-pipeline)
 TEST_SCRIPT := architectures/lambda-canary-pipeline/tests/lambda-rollout-smoke-test.sh
+else ifeq ($(arch),warm-standby)
+TEST_SCRIPT := architectures/warm-standby/tests/test-failover.sh
 endif
 
 all: init validate plan
